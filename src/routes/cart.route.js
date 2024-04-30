@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Cart = require('../../utils/cart');
+import Cart from '../../utils/cart.js';
 
 
 const Carts = new Cart ();
@@ -30,4 +30,17 @@ router.post('/cart/:id/product/:pid', async (req, res) => {
     res.json({prodAgregado});
 });
 
-module.exports = router;
+router.delete("/cart/:id/product/:pid", async (req, res) => {
+    try{
+        const { id } = req.params;
+        const { pid } = req.params;
+        cartId = parseInt(id);
+        productId = parseInt(pid);
+        const resultado = await Carts.deleteproductfromcart(cartId, productId);
+        res.json(resultado);
+    }catch(error){
+        res.status(400).send({ error: error.message });
+    }
+});
+
+export default router;

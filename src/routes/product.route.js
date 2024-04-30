@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Product = require('../../utils/products.js');
+import Product from '../../utils/products.js';
 
 const products = new Product();
 
@@ -18,8 +18,12 @@ router.get('/products/:id', async (req, res) => {
 
 router.post('/products', async (req, res) => {
     const product = req.body;
-    await products.addProduct(product);
-    res.json({ message: 'Producto agregado' });
+    try{
+        await products.addProduct(product);
+        res.json({ message: 'Producto agregado' });
+    }catch(error){
+        res.status(400).send({ error: error.message });
+    }
 });
 
 router.put('/products/:id', async (req, res) => {
@@ -37,4 +41,4 @@ router.delete('/products/:id', async (req, res) => {
     res.json({ message: 'Producto eliminado' });
 });
 
-module.exports = router;
+export default router;

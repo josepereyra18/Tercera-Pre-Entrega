@@ -1,0 +1,54 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="../public/css/style.css">
+</head>
+<div>
+        <h1>Real Time Products</h1>
+        <div id="idContainer">
+            <form class="formContainer">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="AddName" placeholder="Name">
+                <label for="price">Price</label>
+                <input type="number" name="price" id= "AddName" placeholder="Price">
+                <label for="code">Code</label>
+                <input type="text" name="code" id="AddCode" placeholder="Code">
+                <label for="description">Description</label>
+                <input type="text" name="description" id= "AddDescription"placeholder="Description">
+                <label for="stock">Stock</label>
+                <input type="number" name="stock" id="AddStock"placeholder="Stock">
+                <label for="category">Category</label>
+                <input type="text" name="category" id="AddCategory" placeholder="Category">
+                <button type="submit" id="agregar">Agregar</button>
+            </form>
+        </div>
+        <div>
+            <form class="formContainer">
+                <label for="DelateId">Id</label>
+                <input type="number" name="DelateId" id="DelateId" placeholder="Id">
+                <button type="submit" id="eliminar">Eliminar</button>
+            </form>
+        </div>
+        <div>
+            <form class="formContainer">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="ModName" placeholder="Name">
+                <label for="price">Price</label>
+                <input type="number" name="price" id= "ModPrice" placeholder="Price">
+                <label for="code">Code</label>
+                <input type="text" name="code" id="ModCode" placeholder="Code">
+                <label for="description">Description</label>
+                <input type="text" name="description" id= "ModDescription"placeholder="Description">
+                <label for="stock">stock</label>
+                <input type="number" name="stock" id="ModStock"placeholder="Stock">
+                <label for="id">id:</label>
+                <input type="number" name="DelateId" id="ModId" placeholder="Id">
+                <label for="category">Category</label>
+                <input type="text" name="category" id="ModCategory" placeholder="Category">
+                <button type="submit" id="modificar">Modificar</button>
+            </form>
+        </div>
+    </div>
+    <div id="Realtimeprod">
+    </div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realTimeProducts.js"></script>
+

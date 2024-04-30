@@ -1,32 +1,21 @@
 [
   {
-    "title": "pepepeokfw",
-    "description": "pepas ricas",
-    "price": 230,
-    "code": 9080,
-    "stock": 45,
-    "status": "true",
-    "category": "comida de mate",
+    "title": "Funko Pop Obi Wan Kenobi",
+    "description": "Funko Pop de Obi Wan Kenobi",
+    "price": "Funko Pop Obi Wan Kenobi",
+    "code": "obiwan34",
+    "stock": "5",
+    "status": true,
+    "category": "Star Wars",
     "id": 1
   },
   {
-    "title": "peponas",
-    "description": "pepas ricas",
-    "price": 230,
-    "code": 90,
-    "stock": 45,
-    "status": "true",
-    "category": "comida de mate",
+    "title": "Lightsaber Anakin Skywalker",
+    "description": "LightSaber de Anakin Skywalker",
+    "price": "80",
+    "code": "TheLightSide",
+    "stock": "2",
+    "category": "Satar Wars",
     "id": 2
-  },
-  {
-    "title": "prueba123",
-    "description": "pepas ricas",
-    "price": 230,
-    "code": 905,
-    "stock": 45,
-    "status": "true",
-    "category": "comida de mate",
-    "id": 3
   }
 ]

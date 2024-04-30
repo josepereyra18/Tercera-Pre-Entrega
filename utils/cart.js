@@ -1,5 +1,5 @@
-const fs = require('fs').promises;
-const productos = require('./products.js');
+import { promises as fs } from 'fs';
+import productos from './products.js';
 
 class Cart{
     constructor(){
@@ -89,7 +89,29 @@ class Cart{
             console.log('Error al agregar producto al carrito', error);
         }
     }
+    async deleteproductfromcart(id, prodId){
+        await this.leerCart();
+        const carritoEncontrado = this.cart.find((carrito)=> carrito.id === id);
+        if (!carritoEncontrado){
+            throw new Error('El carrito no existe');
+        }
+        
+        const productoEnCarrito = carritoEncontrado.products.find((product)=> product.id === prodId);
+        if (!productoEnCarrito){
+            throw new Error ('el producto no pertenece al carrito');
+        }
+        let message
+        if (productoEnCarrito.quantity > 1){
+            productoEnCarrito.quantity--;
+            message = 'Se elimino uno de la cantidad total de este producto'
+        }else{
+            carritoEncontrado.products = carritoEncontrado.products.filter((product)=> product.id !== prodId);
+            message = 'Producto eliminado del carrito'
+        }
+        await fs.writeFile(this.cartFile, JSON.stringify(this.cart, null, 2));
+        return { message }
+    }
 
 }
 
-module.exports = Cart;
+export default Cart;

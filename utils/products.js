@@ -1,4 +1,5 @@
-const fs = require('fs').promises;
+import { promises as fs } from 'fs';
+
 
 class Products{
     constructor(){
@@ -22,25 +23,20 @@ class Products{
 
 
     async addProduct(product){
-        try {
             await this.leerProductos();
             const codigoEncontrado = this.products.find((producto) => producto.code === product.code);
             if (codigoEncontrado) {
-                console.log('El codigo ya existe');
-                return;
+                throw new Error('El producto ya existe');
+                
             }
             if (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.status || !product.category) {
-                console.log('Debe completar todos los datos');
-                return;
+                throw new Error('Debe completar todos los datos');
             }
             const idProducto = this.products.length + 1;
             const producto = { ...product, id: idProducto };
             this.products.push(producto);
             await fs.writeFile(this.productsFile, JSON.stringify(this.products, null, 2));
             console.log('Producto agregado');
-        } catch (error) {
-            console.log('Error al agregar producto', error);
-        }
     }
 
     async getProducts(limite){
@@ -118,4 +114,4 @@ class Products{
 }
 
 
-module.exports = Products;
+export default Products;

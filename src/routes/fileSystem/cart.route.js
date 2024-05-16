@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import Cart from '../../utils/cart.js';
+import Cart from '../../../dao/utils/cart.js';
 
 
 const Carts = new Cart ();

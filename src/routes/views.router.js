@@ -1,14 +1,12 @@
 import express from 'express';
-import Products from '../../utils/products.js';
+import productsModel from '../../dao/models/products.model.js';
 
 const router = express.Router();
 
-const products = new Products();
-
 router.get('/', async(req, res) => {
     
-    const productos = await products.getProducts();
-    res.render('home', {productos})
-})
+    const productos = await productsModel.find();
+    res.render('home', {productos});
+});
 
 export default router;

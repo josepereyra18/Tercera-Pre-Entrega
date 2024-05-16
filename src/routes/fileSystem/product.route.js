@@ -1,6 +1,6 @@
-import express from 'express';
-const router = express.Router();
-import Product from '../../utils/products.js';
+import { Router } from "express";
+const router = Router();
+import Product from '../../dao/utils/products.js';
 
 const products = new Product();
 

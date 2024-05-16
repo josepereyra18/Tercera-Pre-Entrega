@@ -3,7 +3,7 @@ import productos from './products.js';
 
 class Cart{
     constructor(){
-        this.cartFile='./cart.json';
+        this.cartFile='./dao/utils/data/cart.json';
         this.cart = [];
         this.leerCart();
         this.productos = new productos();

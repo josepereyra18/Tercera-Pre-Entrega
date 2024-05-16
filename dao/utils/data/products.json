@@ -17,5 +17,25 @@
     "stock": "2",
     "category": "Satar Wars",
     "id": 2
+  },
+  {
+    "title": "josefina pereyra",
+    "description": "Lightsaber Anakin skywalker",
+    "price": "josefina pereyra",
+    "code": "jkjk",
+    "stock": "5",
+    "status": true,
+    "category": "Star Wasr",
+    "id": 3
+  },
+  {
+    "title": "sldufha",
+    "description": "gadsfgasdfg",
+    "price": "sldufha",
+    "code": "asdfgasdfg",
+    "stock": "2",
+    "status": true,
+    "category": "asdfgAWSRG",
+    "id": 4
   }
 ]

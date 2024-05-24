@@ -5,6 +5,8 @@ import viewsRouter from './routes/views.router.js';
 import { Server } from 'socket.io';
 import productsRouter from './routes/products.route.js'
 import cartRouter from './routes/carts.route.js'
+import productsRouter from './routes/products.route.js'
+import cartRouter from './routes/carts.route.js'
 import realTimeProducts from './routes/realTimeProducts.router.js'
 import chatRouter from './routes/message.router.js'
 import mongoose from 'mongoose';
@@ -21,6 +23,8 @@ const socketServer = new Server(httpServer);
 
 mongoose.connect('mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0').then(
     () => {console.log('Conectado a la base de datos')}).catch(error => console.log("error en la conexion ", error))
+mongoose.connect('mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0').then(
+    () => {console.log('Conectado a la base de datos')}).catch(error => console.log("error en la conexion ", error))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,10 +37,13 @@ app.use(express.static(__dirname + '/public'));
 app.use('/api', productsRouter);
 app.use('/api', cartRouter);
 app.use('/chat', chatRouter)
+app.use('/chat', chatRouter)
 app.use('/', viewsRouter);
 app.use("/realTimeProducts", realTimeProducts )
 
 
+let historialMensajes = await chatModel.find();
+let usuarios = []
 let historialMensajes = await chatModel.find();
 let usuarios = []
 socketServer.on('connection', async socket => {
@@ -69,23 +76,29 @@ socketServer.on('connection', async socket => {
 
     async function productosActualizados (){
       const productosActualizados = await productsModel.find() ;
+      const productosActualizados = await productsModel.find() ;
       socketServer.emit('Lista-Modificada', productosActualizados);
     }
 
+    const productos = await productsModel.find();
     const productos = await productsModel.find();
     socket.emit('Lista-Modificada', productos);
 
     // Cuando se elimina un producto
     socket.on ('eliminarProd', async (id) => {
         await productsModel.deleteOne({_id: id});
+        await productsModel.deleteOne({_id: id});
         productosActualizados();
     })
     // Cuando se agrega un producto
     socket.on('agregarProd', async (product) => {
         await productsModel.create({title: product.title, description: product.description, price: product.price, code: product.code, stock: product.stock, status: product.status, category: product.category});
+        await productsModel.create({title: product.title, description: product.description, price: product.price, code: product.code, stock: product.stock, status: product.status, category: product.category});
         productosActualizados();
     })
   // Cuando se modifica un producto
+    socket.on('modificarProd', async (product, id) => {
+        await productsModel.updateOne({_id: id}, product)
     socket.on('modificarProd', async (product, id) => {
         await productsModel.updateOne({_id: id}, product)
         productosActualizados();

@@ -59,3 +59,16 @@
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
+#Realtimeprod{
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    height: 100vh;
+    padding: 50px;
+
+}
+
+.card{
+    margin: 5px;
+}

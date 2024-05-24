@@ -5,13 +5,12 @@ import viewsRouter from './routes/views.router.js';
 import { Server } from 'socket.io';
 import productsRouter from './routes/products.route.js'
 import cartRouter from './routes/carts.route.js'
-import productsRouter from './routes/products.route.js'
-import cartRouter from './routes/carts.route.js'
 import realTimeProducts from './routes/realTimeProducts.router.js'
 import chatRouter from './routes/message.router.js'
 import mongoose from 'mongoose';
 import productsModel from '../dao/models/products.model.js'
 import chatModel from '../dao/models/chat.model.js';
+import cartModel from '../dao/models/cart.model.js';
 import Handlebars from 'handlebars';
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
 
@@ -21,8 +20,6 @@ const PORT = 8080;
 const httpServer = app.listen(PORT, console.log(`Server is running on port ${PORT}`));
 const socketServer = new Server(httpServer);
 
-mongoose.connect('mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0').then(
-    () => {console.log('Conectado a la base de datos')}).catch(error => console.log("error en la conexion ", error))
 mongoose.connect('mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0').then(
     () => {console.log('Conectado a la base de datos')}).catch(error => console.log("error en la conexion ", error))
 
@@ -97,4 +94,23 @@ socketServer.on('connection', async socket => {
     });
 
 
+    //socket agregar productos al carrito 
+    socket.on  ('crearCarrito', async () => {
+        let cart = await cartModel.create({});
+        socket.emit('cartId', cart);
+
+    })
+    socket.on ('agregarProducto', async (productId, cartId) => {
+        let producto = await productsModel.findOne({_id:productId});
+        let carrito = await cartModel.findOne({_id:cartId});
+
+        if (await cartModel.findOne({_id: cartId , products: {$elemMatch: {_id:productId}}})){
+            carrito.products.find(prod => prod._id.toString() === producto._id.toString()).quantity++;
+        }else{
+            carrito.products.push({_id:productId, quantity: 1});
+        }
+        await cartModel.updateOne({_id:cartId}, carrito);
+        socket.emit('productoAgregado', producto);
+    })
+    
 })

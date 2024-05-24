@@ -45,13 +45,22 @@ socket.on('Lista-Modificada', (productos) => {
     productos.forEach(producto => {
         const productoDiv = document.createElement('div');
         productoDiv.innerHTML = `
-            <h2>${producto.title}</h2>
-            <h3>ID: ${producto._id}</h3>
-            <p>Descripcion: ${producto.description}</p>
-            <p>Precio: ${producto.price}</p>
-            <p>Código: ${producto.code}</p>
-            <p>Stock: ${producto.stock}</p>
+            <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">${producto.title}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">${producto._id}</h6>
+                            <p class="card-text">${producto.description}</p>
+                            <p class="card-text">$ ${producto.price}</p>
+                        </div>
+                    </div>
         `;
         listaProductos.appendChild(productoDiv);
     });
 });
+
+            // <h2>${producto.title}</h2>
+            // <h3>ID: ${producto._id}</h3>
+            // <p>Descripcion: ${producto.description}</p>
+            // <p>Precio: ${producto.price}</p>
+            // <p>Código: ${producto.code}</p>
+            // <p>Stock: ${producto.stock}</p>

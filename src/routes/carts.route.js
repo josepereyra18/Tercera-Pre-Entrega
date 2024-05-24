@@ -4,21 +4,17 @@ import productsModel from '../../dao/models/products.model.js';
 const router = Router();
 
 router.get('/cart', async(req, res) => {
-
+    const SpCart = req.query.cid
     try{
-        let carts = await cartsModel.find();
-        res.send({result: "success", payload: carts});
+        if (SpCart){
+            let carts = await cartsModel.findOne({_id: SpCart});
+            res.send({result: "success", payload: carts});
+        }else{
+            let carts = await cartsModel.find();
+            res.send({result: "success", payload: carts});
+            
+        }
     } catch (error){
-        console.log(error);
-    }
-});
-
-router.get('/cart/:id', async(req, res) => {
-    const { id } = req.params;
-    try{
-        let cart = await cartsModel.findOne({_id: id});
-        res.send({result: "success", payload: cart});
-    }catch(error){
         console.log(error);
     }
 });
@@ -29,8 +25,8 @@ router.post('/cart', async(req, res) => {
 })
 
 router.post('/cart/:id/product/:pid', async(req, res) => {
-    const { id } = req.params;
-    const { pid } = req.params;
+    let { id } = req.params;
+    let { pid } = req.params;
     try{
         let carrito = await cartsModel.findOne({_id:id});
         let producto = await productsModel.findOne({_id:pid});
@@ -52,11 +48,46 @@ router.post('/cart/:id/product/:pid', async(req, res) => {
 })
 
 
-router.put
+router.put ('/carts/:cid', async(req, res) => {
+    let arregloProductos = req.body;
+    let { cid } = req.params;
+
+    try{
+        let cart = await cartsModel.findById(cid);
+
+        cart.products = arregloProductos;
+
+        let cartUpdated = await cartsModel.updateOne({_id: cid}, cart);
+        res.send({result: "success", payload: cartUpdated});
+    }catch(error){
+        console.log(error);
+        res.send({message: "Existe un error en los datos brindados. No se pudo modificar el carrito"});
+    }    
+})
+
+
+router.put('/carts/:cid/products/:pid', async (req, res) => {
+    let { cid } = req.params;
+    let { pid } = req.params;
+    let { quantity } = req.body;
+
+    try {
+        let cart = await cartsModel.findById(cid);
+        let product = cart.products.find(prod => prod._id.toString() === pid);
+        product.quantity = quantity;
+
+        let cartUpdated = await cartsModel.updateOne({ _id: cid }, cart);
+
+        res.send({ result: "success", payload: cartUpdated });
+    } catch (error) {
+        console.log(error);
+        res.send({ message: "No se pudo actualizar la cantidad del producto en el carrito" });
+    }
+});
 
 router.delete('/cart/:id/product/:pid', async(req, res) => {
-    const { id } = req.params;
-    const { pid } = req.params;
+    let { id } = req.params;
+    let { pid } = req.params;
     let prodAgregado;
     try{
         let carrito = await cartsModel.findOne({_id: id});
@@ -79,8 +110,10 @@ router.delete('/cart/:id/product/:pid', async(req, res) => {
     }
 })
 
+
+
 router.delete('/cart/:id', async(req, res) => {
-    const { id } = req.params;
+    let { id } = req.params;
     try{
         let carrito = await cartsModel.findOne({_id: id});
         carrito.products = [];

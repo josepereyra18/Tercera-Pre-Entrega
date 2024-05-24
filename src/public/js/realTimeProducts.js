@@ -9,7 +9,7 @@ const btnModificar = document.getElementById('modificar');
         const product = {
             title: document.getElementById('AddName').value,
             description: document.getElementById('AddDescription').value,
-            price: document.getElementById('AddName').value,
+            price: document.getElementById('AddPrice').value,
             code: document.getElementById('AddCode').value,
             stock: document.getElementById('AddStock').value,
             status:true,
@@ -19,8 +19,7 @@ const btnModificar = document.getElementById('modificar');
     })
     btnEliminar.addEventListener('click', async () => {
         const id = document.getElementById('DelateId').value
-        const idNumber = parseInt(id);
-        socket.emit('eliminarProd', idNumber);
+        socket.emit('eliminarProd', id);
     });
 
     btnModificar.addEventListener('click', async () => {
@@ -31,9 +30,10 @@ const btnModificar = document.getElementById('modificar');
             code: document.getElementById('ModCode').value,
             stock: document.getElementById('ModStock').value,
             category: document.getElementById('ModCategory').value,
-            id: document.getElementById('ModId').value
         }
-        socket.emit('modificarProd', product);
+
+        let id = document.getElementById('ModId').value;
+        socket.emit('modificarProd', product, id);
     });
 
 
@@ -41,12 +41,12 @@ const btnModificar = document.getElementById('modificar');
 
 socket.on('Lista-Modificada', (productos) => {
     const listaProductos = document.getElementById('Realtimeprod');
-    console.log(productos);
+    listaProductos.innerHTML = '';
     productos.forEach(producto => {
         const productoDiv = document.createElement('div');
         productoDiv.innerHTML = `
             <h2>${producto.title}</h2>
-            <h3>ID: ${producto.id}</h3>
+            <h3>ID: ${producto._id}</h3>
             <p>Descripcion: ${producto.description}</p>
             <p>Precio: ${producto.price}</p>
             <p>Código: ${producto.code}</p>

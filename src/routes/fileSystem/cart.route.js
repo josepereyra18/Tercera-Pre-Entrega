@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import Cart from '../../utils/cart.js';
+import Cart from '../../../dao/utils/cart.js';
 
 
 const Carts = new Cart ();
@@ -29,6 +29,7 @@ router.post('/cart/:id/product/:pid', async (req, res) => {
     const prodAgregado = await Carts.addProductToCart(cartId, productId);
     res.json({prodAgregado});
 });
+
 
 router.delete("/cart/:id/product/:pid", async (req, res) => {
     try{

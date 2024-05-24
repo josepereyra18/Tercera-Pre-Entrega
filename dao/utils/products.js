@@ -1,9 +1,8 @@
 import { promises as fs } from 'fs';
 
-
 class Products{
     constructor(){
-        this.productsFile='./products.json';
+        this.productsFile='./dao/utils/data/products.json';
         this.products = [];
         this.leerProductos();
     }

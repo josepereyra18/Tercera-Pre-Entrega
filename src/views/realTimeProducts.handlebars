@@ -1,14 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="../public/css/style.css">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
 </head>
-<div>
+<body>
+    <div id = "realContainer" style="display: flex; flex-direction: column;">
         <h1>Real Time Products</h1>
-        <div id="idContainer">
+        <div class="idContainer" style="display: flex; ">
+            <p>Crear Productos</p>
             <form class="formContainer">
                 <label for="name">Name</label>
                 <input type="text" name="name" id="AddName" placeholder="Name">
                 <label for="price">Price</label>
-                <input type="number" name="price" id= "AddName" placeholder="Price">
+                <input type="number" name="price" id= "AddPrice" placeholder="Price">
                 <label for="code">Code</label>
                 <input type="text" name="code" id="AddCode" placeholder="Code">
                 <label for="description">Description</label>
@@ -20,14 +28,16 @@
                 <button type="submit" id="agregar">Agregar</button>
             </form>
         </div>
-        <div>
-            <form class="formContainer">
+        <div class="idContainer">
+            <p>Eliminar Productos</p>
+            <form class="formContainerdelete">
                 <label for="DelateId">Id</label>
-                <input type="number" name="DelateId" id="DelateId" placeholder="Id">
+                <input type="text" name="DelateId" id="DelateId" placeholder="Id">
                 <button type="submit" id="eliminar">Eliminar</button>
             </form>
         </div>
-        <div>
+        <div class="idContainer">
+            <p>Modificar Productos</p>
             <form class="formContainer">
                 <label for="name">Name</label>
                 <input type="text" name="name" id="ModName" placeholder="Name">
@@ -40,7 +50,7 @@
                 <label for="stock">stock</label>
                 <input type="number" name="stock" id="ModStock"placeholder="Stock">
                 <label for="id">id:</label>
-                <input type="number" name="DelateId" id="ModId" placeholder="Id">
+                <input type="text" name="DelateId" id="ModId" placeholder="Id">
                 <label for="category">Category</label>
                 <input type="text" name="category" id="ModCategory" placeholder="Category">
                 <button type="submit" id="modificar">Modificar</button>
@@ -49,6 +59,8 @@
     </div>
     <div id="Realtimeprod">
     </div>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/realTimeProducts.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/realTimeProducts.js"></script>
+</body>
+</html>
 

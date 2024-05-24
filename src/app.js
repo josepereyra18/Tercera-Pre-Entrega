@@ -44,8 +44,6 @@ app.use("/realTimeProducts", realTimeProducts )
 
 let historialMensajes = await chatModel.find();
 let usuarios = []
-let historialMensajes = await chatModel.find();
-let usuarios = []
 socketServer.on('connection', async socket => {
     console.log('Un cliente se ha conectado');
     // soket Chat
@@ -76,29 +74,23 @@ socketServer.on('connection', async socket => {
 
     async function productosActualizados (){
       const productosActualizados = await productsModel.find() ;
-      const productosActualizados = await productsModel.find() ;
       socketServer.emit('Lista-Modificada', productosActualizados);
     }
 
-    const productos = await productsModel.find();
     const productos = await productsModel.find();
     socket.emit('Lista-Modificada', productos);
 
     // Cuando se elimina un producto
     socket.on ('eliminarProd', async (id) => {
         await productsModel.deleteOne({_id: id});
-        await productsModel.deleteOne({_id: id});
         productosActualizados();
     })
     // Cuando se agrega un producto
     socket.on('agregarProd', async (product) => {
         await productsModel.create({title: product.title, description: product.description, price: product.price, code: product.code, stock: product.stock, status: product.status, category: product.category});
-        await productsModel.create({title: product.title, description: product.description, price: product.price, code: product.code, stock: product.stock, status: product.status, category: product.category});
         productosActualizados();
     })
   // Cuando se modifica un producto
-    socket.on('modificarProd', async (product, id) => {
-        await productsModel.updateOne({_id: id}, product)
     socket.on('modificarProd', async (product, id) => {
         await productsModel.updateOne({_id: id}, product)
         productosActualizados();

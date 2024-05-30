@@ -79,12 +79,20 @@ socketServer.on('connection', async socket => {
 
     // Cuando se elimina un producto
     socket.on ('eliminarProd', async (id) => {
-        await productsModel.deleteOne({_id: id});
+        await cartModel.updateMany({ products: {_id : id}}, { $pull: { products: {_id : id} } });
+        await productsModel.deleteOne({_id: id})
         productosActualizados();
     })
     // Cuando se agrega un producto
     socket.on('agregarProd', async (product) => {
-        await productsModel.create({title: product.title, description: product.description, price: product.price, code: product.code, stock: product.stock, status: product.status, category: product.category});
+        await productsModel.create({
+            title: product.title, 
+            description: product.description, 
+            price: product.price, 
+            code: product.code, 
+            stock: product.stock, 
+            status: product.status, 
+            category: product.category});
         productosActualizados();
     })
   // Cuando se modifica un producto
@@ -104,13 +112,15 @@ socketServer.on('connection', async socket => {
         let producto = await productsModel.findOne({_id:productId});
         let carrito = await cartModel.findOne({_id:cartId});
 
-        if (await cartModel.findOne({_id: cartId , products: {$elemMatch: {_id:productId}}})){
-            carrito.products.find(prod => prod._id.toString() === producto._id.toString()).quantity++;
+        if (await cartModel.findOne({_id: cartId , products: {$elemMatch: {product:productId}}})){
+            carrito.products.find(prod => prod.product.toString() === producto._id.toString()).quantity++;
         }else{
-            carrito.products.push({_id:productId, quantity: 1});
+            carrito.products.push({product:productId , quantity: 1});
         }
         await cartModel.updateOne({_id:cartId}, carrito);
         socket.emit('productoAgregado', producto);
     })
     
 })
+
+

@@ -2,7 +2,6 @@ import express from 'express';
 import productsModel from '../../dao/models/products.model.js';
 const router = express.Router();
 
-
 router.get('/', async(req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit) : 10;
@@ -12,10 +11,10 @@ router.get('/', async(req, res) => {
         let sort = {};
 
         if (req.query.sort) {
-            if (req.query.sort ==="asc"){
-                sort = {price: 1}
-            }else if (req.query.sort ==="desc"){
-                sort = {price: -1}
+            if (req.query.sort === "asc") {
+                sort = { price: 1 };
+            } else if (req.query.sort === "desc") {
+                sort = { price: -1 };
             }
         }
 
@@ -34,6 +33,11 @@ router.get('/', async(req, res) => {
         };
 
         const result = await productsModel.paginate(query, options);
+
+        if (page > result.totalPages) {
+            return res.status(404).send('Página no encontrada');
+        }
+
         res.render('home', { productos: result.docs });
     } catch (error) {
         console.error(error);

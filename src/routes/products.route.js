@@ -1,5 +1,6 @@
 import { Router } from "express";
 import productsModel from '../../dao/models/products.model.js';
+import cartModel from "../../dao/models/cart.model.js";
 
 const router = Router();
 
@@ -44,6 +45,7 @@ router.put('/products/:id', async (req, res) => {
 
 router.delete('/products/:id', async(req, res) => {
     let { id } = req.params;
+    await cartModel.updateMany({ products: {_id : id}}, { $pull: { products: {_id : id} } });
     let result = await productsModel.deleteOne({_id: id});
     res.send({result: "success", payload: result});
 })

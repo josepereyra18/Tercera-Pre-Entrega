@@ -1,9 +1,20 @@
 import express from 'express';
-import productsModel from '../../dao/models/products.model.js';
 const router = express.Router();
+import { isAuthenticated, isNotAuthenticated } from '../middlewares/auth.js';
+import productsModel from '../../dao/models/products.model.js';
 
-router.get('/', async(req, res) => {
+
+router.get('/',(req, res) => {
+    res.render('login')
+});
+
+router.get('/register', isNotAuthenticated,(req, res) => {
+    res.render('register')
+});
+
+router.get('/products', isAuthenticated ,async(req, res) => {
     try {
+        const name = req.session.user.name;
         const limit = req.query.limit ? parseInt(req.query.limit) : 10;
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const category = req.query.category;
@@ -38,11 +49,12 @@ router.get('/', async(req, res) => {
             return res.status(404).send('Página no encontrada');
         }
 
-        res.render('home', { productos: result.docs });
+        res.render('home', { productos: result.docs , name: name});
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al obtener los productos');
     }
 });
+
 
 export default router;

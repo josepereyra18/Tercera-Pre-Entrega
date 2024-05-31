@@ -3,22 +3,34 @@ import __dirname from './utils.js';
 import handlebars from 'express-handlebars';
 import viewsRouter from './routes/views.router.js';
 import { Server } from 'socket.io';
-import productsRouter from './routes/products.route.js'
-import cartRouter from './routes/carts.route.js'
-import realTimeProducts from './routes/realTimeProducts.router.js'
-import chatRouter from './routes/message.router.js'
+import productsRouter from './routes/api/products.route.js'
+import cartRouter from './routes//api/carts.route.js'
+import realTimeProducts from './routes/api/realTimeProducts.router.js'
+import chatRouter from './routes/api/message.router.js'
 import mongoose from 'mongoose';
 import productsModel from '../dao/models/products.model.js'
 import chatModel from '../dao/models/chat.model.js';
 import cartModel from '../dao/models/cart.model.js';
 import Handlebars from 'handlebars';
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
+import sessionRouter from './routes/api/session.router.js';
+import MongoStore from 'connect-mongo';
+import session from 'express-session';  
 
 const app = express();
 
-const PORT = 8080;
+const PORT = 3000;
 const httpServer = app.listen(PORT, console.log(`Server is running on port ${PORT}`));
 const socketServer = new Server(httpServer);
+
+app.use(session({
+    secret: 'secretkey',
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: 'mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0' }),
+    // cookie: { maxAge: 180 * 60 * 1000 },
+}));
+
 
 mongoose.connect('mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0').then(
     () => {console.log('Conectado a la base de datos')}).catch(error => console.log("error en la conexion ", error))
@@ -28,6 +40,8 @@ app.use(express.urlencoded({ extended: true }));
 app.engine('handlebars', handlebars.engine({
   handlebars: allowInsecurePrototypeAccess(Handlebars)
 }));
+
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 app.use(express.static(__dirname + '/public'));
@@ -35,8 +49,9 @@ app.use('/api', productsRouter);
 app.use('/api', cartRouter);
 app.use('/chat', chatRouter)
 app.use('/chat', chatRouter)
-app.use('/', viewsRouter);
 app.use("/realTimeProducts", realTimeProducts )
+app.use('/api/session', sessionRouter);
+app.use('/', viewsRouter);
 
 
 let historialMensajes = await chatModel.find();

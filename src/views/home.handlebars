@@ -10,7 +10,10 @@
 <body>
     <div class="container">
         <h1 class="titulo" >Productos</h1>
-        <button class="btn btn-primary crearCarrito"> Crear carrito</button>
+        <div class="banner">
+            <button class="btn btn-primary crearCarrito"> Crear carrito</button>
+            <a href="/api/session/logout" class="btn btn-primary">Logout</a>
+        </div>
         <h2 class="titulo">Bienvenido, {{name}}</h2>
         <div class= "coco">
             {{#each productos}}

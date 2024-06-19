@@ -1,59 +1,53 @@
 import { Router } from "express";
 import userModel from '../../../dao/models/user.model.js'
+import passport from "passport";
 
 const router = Router();
 
-router.post('/register', async(req, res) => {
-    let { name, last_name, email, password, age } = req.body;
-    let newUser
-    if (!name || !last_name || !email || !password || !age){
-        res.send({status: error, message: "Faltan datos"});
-    }
-
-    try{
-        if (email ==="admin@coder.com" && password === "Cod3r123"){
-            newUser = new userModel({name, last_name, email, password, age, isAdmin: 'admin'});
-            
-        }else{
-            newUser = new userModel({name, last_name, email, password, age});
-        }
-        await newUser.save();
-        res.redirect('/');
-    }catch(error){
-        res.status(500).send({message: "Error al crear el usuario"});
-    }
+router.post('/register', passport.authenticate('register', {failureRedirect : 'failregister'}), async(req, res) => {
+    res.send({ status: "success", message: "Usuario registrado"})
+    res.redirect("/")
 });
 
-router.post('/login', async(req, res) => {
-    const { email, password } = req.body;
-        try{
-            const user = await userModel.findOne({email: email});
-            if (!user) {
-                return res.status(404).send("Usuario no encontrado");
-            }else{
-                req.session.user = {
-                    id: user._id,
-                    name: user.name,
-                    last_name: user.last_name,
-                    email: user.email,
-                    password : user.password,
-                    age: user.age
-                }
-                res.redirect('/products')
-            }
+router.get('/failregister', (req, res) => {
+    console.log("Usuario ya registrado");
+    res.send({error:"upsi dupsy, usuario ya registrado"})
+});
 
+router.post('/login', passport.authenticate('login', {failureRedirect: 'faillogin'}) , async(req, res) => {
+    if (!req.user) return res.status(404).send({status: "error",error : "Datos incompletos"});
+        try{
+            req.session.user = {
+                name: req.user.name,
+                last_name: req.user.last_name,
+                email: req.user.email,
+                age: req.user.age,
+               };
+               console.log(req.session.user);
+            res.redirect('/products')
         } catch(error) {
             res.status(500).send({message: "Error al buscar el usuario"});
         }
 });
 
+router.get('/faillogin', (req, res) => {
+    console.log("Usuario no encontrado");
+    res.send({error: "Usuario no encontrado"});
+});
+
 router.get('/logout', (req, res) => {
     req.session.destroy((err)=>{
         if (err) return res.status(500).send('Error al cerrar sesión');
-        res.redirect('/login');
+        res.redirect('/');
     });
 });
 
+router.get('/github', passport.authenticate('github',{scope:["user:email"]}), async(req,res)=>{ });
+
+router.get('/githubcallback', passport.authenticate('github', {failureRedirect:'/login'}), async(req,res)=>{
+    req.session.user = req.user
+    res.redirect("/products")
+})
 
 
 export default router;

@@ -16,10 +16,12 @@ import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access
 import sessionRouter from './routes/api/session.router.js';
 import MongoStore from 'connect-mongo';
 import session from 'express-session';  
+import passport from 'passport';
+import initializepassport from './middlewares/passport.config.js';
 
 const app = express();
 
-const PORT = 3000;
+const PORT = 8080;
 const httpServer = app.listen(PORT, console.log(`Server is running on port ${PORT}`));
 const socketServer = new Server(httpServer);
 
@@ -27,8 +29,7 @@ app.use(session({
     secret: 'secretkey',
     resave: false,
     saveUninitialized: true,
-    store: MongoStore.create({ mongoUrl: 'mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0' }),
-    // cookie: { maxAge: 180 * 60 * 1000 },
+    store: MongoStore.create({ mongoUrl: 'mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0' })
 }));
 
 
@@ -40,6 +41,11 @@ app.use(express.urlencoded({ extended: true }));
 app.engine('handlebars', handlebars.engine({
   handlebars: allowInsecurePrototypeAccess(Handlebars)
 }));
+
+
+initializepassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 app.set('views', __dirname + '/views');

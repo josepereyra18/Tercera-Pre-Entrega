@@ -10,7 +10,7 @@ const LocalStrategy = local.Strategy;
 const initializepassport = () => {
     passport.use('register', new LocalStrategy(
         { passReqToCallback: true, usernameField: 'email' }, async (req, username, password, done) => {
-            const { name, last_name, age, email } = req.body;
+            const { first_name, last_name, age, email } = req.body;
             try {
                 let newUser
                 let user = await User.findOne({ email: username });
@@ -21,7 +21,7 @@ const initializepassport = () => {
                 let cart = await Cart.create({})
                 if (email ==="admin@coder.com" && password === "Cod3r123"){
                     newUser = new User({
-                        name, 
+                        first_name, 
                         last_name, 
                         email, 
                         password: createHash(password), 
@@ -30,7 +30,7 @@ const initializepassport = () => {
                     
                 }else{
                     newUser = new User({
-                        name, 
+                        first_name,
                         last_name, 
                         email, 
                         password: createHash(password), 
@@ -74,7 +74,7 @@ const initializepassport = () => {
             let user = await User.findOne({email:profile._json.email});
             if (!user){
                 let newUser ={
-                    name: profile._json.name,
+                    first_name: profile._json.name,
                     last_name:"",
                     email: profile._json.email,
                     age: 18,

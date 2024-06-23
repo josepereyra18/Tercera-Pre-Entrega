@@ -17,7 +17,7 @@ router.post('/login', passport.authenticate('login', {failureRedirect: 'faillogi
     if (!req.user) return res.status(404).send({status: "error",error : "Datos incompletos"});
         try{
             req.session.user = {
-                name: req.user.name,
+                first_name: req.user.first_name,
                 last_name: req.user.last_name,
                 email: req.user.email,
                 age: req.user.age,

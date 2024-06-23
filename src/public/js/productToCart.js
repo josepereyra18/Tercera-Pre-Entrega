@@ -1,14 +1,9 @@
 const socket = io();
 
 const agregarAlCarritoBtn = document.getElementsByClassName('btn btn-primary AgregarAlCarrito');
-const crearCarritoBtn = document.getElementsByClassName('btn btn-primary crearCarrito');
 let carritoId
 
-for (let btn of crearCarritoBtn) {
-    btn.addEventListener('click', async (e) => {
-        socket.emit('crearCarrito');
-    });
-  }
+
 
 
   for (let btn of agregarAlCarritoBtn) {

@@ -1,5 +1,4 @@
 import { Router } from "express";
-import userModel from '../../../dao/models/user.model.js'
 import passport from "passport";
 
 const router = Router();
@@ -25,7 +24,7 @@ router.post('/login', passport.authenticate('login', {failureRedirect: 'faillogi
                 cartId: req.user.cartId
                };
                console.log(req.session.user);
-            res.redirect('/products')
+            res.redirect('/current')
         } catch(error) {
             res.status(500).send({message: "Error al buscar el usuario"});
         }

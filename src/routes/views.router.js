@@ -12,7 +12,7 @@ router.get('/register', isNotAuthenticated,(req, res) => {
     res.render('register')
 });
 
-router.get('/products', isAuthenticated ,async(req, res) => {
+router.get('/current', isAuthenticated ,async(req, res) => {
     try {
         // req.session.user = {
         //     name: req.user.name,

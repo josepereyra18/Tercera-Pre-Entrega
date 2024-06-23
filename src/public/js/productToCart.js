@@ -45,8 +45,8 @@ socket.on('cartId', (data) => {
     Swal.fire({
         toast: true,
         position: 'top-end',
-        icon: 'success',
-        title: `carrito creado exitosamente :D`,
+        icon: 'info',
+        title: `bienvenid@! Inicio de sesion exitosa`,
         showConfirmButton: false,
         timer: 3000
     });

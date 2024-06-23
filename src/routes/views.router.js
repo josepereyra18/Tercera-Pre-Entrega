@@ -14,6 +14,14 @@ router.get('/register', isNotAuthenticated,(req, res) => {
 
 router.get('/products', isAuthenticated ,async(req, res) => {
     try {
+        // req.session.user = {
+        //     name: req.user.name,
+        //     last_name: req.user.last_name,
+        //     email: req.user.email,
+        //     age: req.user.page,
+        //     cartId: req.user.cartId
+        // };
+
         const name = req.session.user.name;
         const limit = req.query.limit ? parseInt(req.query.limit) : 10;
         const page = req.query.page ? parseInt(req.query.page) : 1;
@@ -49,7 +57,7 @@ router.get('/products', isAuthenticated ,async(req, res) => {
             return res.status(404).send('Página no encontrada');
         }
 
-        res.render('home', { productos: result.docs , name: name});
+        res.render('home', { productos: result.docs , name: name });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al obtener los productos');

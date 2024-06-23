@@ -18,26 +18,34 @@ import MongoStore from 'connect-mongo';
 import session from 'express-session';  
 import passport from 'passport';
 import initializepassport from './middlewares/passport.config.js';
+import sharedSession from 'express-socket.io-session';
 
 const app = express();
 
 const PORT = 8080;
 const httpServer = app.listen(PORT, console.log(`Server is running on port ${PORT}`));
 const socketServer = new Server(httpServer);
-
-app.use(session({
-    secret: 'secretkey',
+const sessionMiddleware = session(
+    {secret: 'secretkey',
     resave: false,
     saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: 'mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0' })
-}));
+})
 
+app.use(sessionMiddleware)
+
+
+socketServer.use(sharedSession(sessionMiddleware, {
+    autoSave: true
+}));
 
 mongoose.connect('mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0').then(
     () => {console.log('Conectado a la base de datos')}).catch(error => console.log("error en la conexion ", error))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
 app.engine('handlebars', handlebars.engine({
   handlebars: allowInsecurePrototypeAccess(Handlebars)
 }));
@@ -59,10 +67,12 @@ app.use("/realTimeProducts", realTimeProducts )
 app.use('/api/session', sessionRouter);
 app.use('/', viewsRouter);
 
-
 let historialMensajes = await chatModel.find();
 let usuarios = []
 socketServer.on('connection', async socket => {
+    const session = socket.handshake.session;
+
+
     console.log('Un cliente se ha conectado');
     // soket Chat
     socket.on('authenticate', (data) => {
@@ -124,11 +134,14 @@ socketServer.on('connection', async socket => {
 
 
     //socket agregar productos al carrito 
-    socket.on  ('crearCarrito', async () => {
-        let cart = await cartModel.create({});
-        socket.emit('cartId', cart);
 
-    })
+    if (session && session.user && session.user.cartId) {
+        const cartId = session.user.cartId;
+        console.log('Cart ID from session:', cartId);
+        socket.emit('cartId', cartId);
+    }
+
+
     socket.on ('agregarProducto', async (productId, cartId) => {
         let producto = await productsModel.findOne({_id:productId});
         let carrito = await cartModel.findOne({_id:cartId});
@@ -138,10 +151,9 @@ socketServer.on('connection', async socket => {
         }else{
             carrito.products.push({product:productId , quantity: 1});
         }
+        
         await cartModel.updateOne({_id:cartId}, carrito);
         socket.emit('productoAgregado', producto);
     })
     
 })
-
-

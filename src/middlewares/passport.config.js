@@ -3,6 +3,7 @@ import local from "passport-local";
 import User from "../../dao/models/user.model.js";
 import { createHash, isValidPassword } from "../utils.js";
 import GitHubStrategy from "passport-github2";
+import Cart from "../../dao/models/cart.model.js";
 
 
 const LocalStrategy = local.Strategy;
@@ -17,6 +18,7 @@ const initializepassport = () => {
                     console.log ("el usuario ya existe")
                     return done(null, false)
                 }
+                let cart = await Cart.create({})
                 if (email ==="admin@coder.com" && password === "Cod3r123"){
                     newUser = new User({
                         name, 
@@ -32,9 +34,12 @@ const initializepassport = () => {
                         last_name, 
                         email, 
                         password: createHash(password), 
-                        age});
+                        age,
+                        cartId: cart._id});
                 }
                 let result = await User.create(newUser);
+                cart.userId = result._id;
+                await cart.save();
                 return done(null, result)
             } catch (error) {
                 return done("Error al obtener el usuario " + error)

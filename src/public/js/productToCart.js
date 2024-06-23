@@ -4,7 +4,6 @@ const agregarAlCarritoBtn = document.getElementsByClassName('btn btn-primary Agr
 const crearCarritoBtn = document.getElementsByClassName('btn btn-primary crearCarrito');
 let carritoId
 
-
 for (let btn of crearCarritoBtn) {
     btn.addEventListener('click', async (e) => {
         socket.emit('crearCarrito');
@@ -51,5 +50,5 @@ socket.on('cartId', (data) => {
         showConfirmButton: false,
         timer: 3000
     });
-    carritoId = data._id;
+    carritoId = data;
 })

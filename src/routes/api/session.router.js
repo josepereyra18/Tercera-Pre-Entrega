@@ -4,8 +4,8 @@ import passport from "passport";
 
 const router = Router();
 
+
 router.post('/register', passport.authenticate('register', {failureRedirect : 'failregister'}), async(req, res) => {
-    res.send({ status: "success", message: "Usuario registrado"})
     res.redirect("/")
 });
 
@@ -22,6 +22,7 @@ router.post('/login', passport.authenticate('login', {failureRedirect: 'faillogi
                 last_name: req.user.last_name,
                 email: req.user.email,
                 age: req.user.age,
+                cartId: req.user.cartId
                };
                console.log(req.session.user);
             res.redirect('/products')

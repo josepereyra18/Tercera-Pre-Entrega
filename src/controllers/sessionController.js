@@ -17,7 +17,6 @@ export const login = async (req, res) => {
                 age: req.user.age,
                 cartId: req.user.cartId
                };
-               console.log(req.session.user);
             res.redirect('/current')
         } catch(error) {
             res.status(500).send({message: "Error al buscar el usuario"});

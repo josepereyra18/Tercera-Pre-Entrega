@@ -1,41 +1,14 @@
-import productsModel from '../models/products.model.js'
-
-// async function getProducts() {
-//     return await productsModel.find()
-// }
-
-
-// async function getProductById(productId) {
-//     return await productsModel.findById(productId)
-// }
-
-
-// async function createProduct(product) {
-//     return await productsModel.create(product)
-// }
-
-// async function updateProduct(productId, product) {
-//     return await productsModel.updateOne({_id: productId}, product)
-// }
-
-// async function deleteProduct(productId) {
-//     return await productsModel.deleteOne({_id: productId});
-// }
-
-
-// export default {
-//     getProducts,
-//     getProductById,
-//     createProduct,
-//     updateProduct,
-//     deleteProduct
-// }
-
 export default class Products{
+
+    constructor() {
+        this.data = [];
+    }
+
     getProducts = async () => {
         try{
-            let productos = await productsModel.find();
-            return productos;
+
+            return this.data;
+
         }catch(error){
             console.log(error);
             return null;
@@ -45,8 +18,10 @@ export default class Products{
 
     getProductById = async (productId) => {
         try{
-            let producto = await productsModel.findById(productId);
-            return producto;
+            
+            const product = this.data.find(product => product.id === productId);
+
+            return product? product : null;
         }catch(error){
             console.log(error);
             return null;
@@ -56,30 +31,39 @@ export default class Products{
 
     createProduct = async (product) => {
         try{
-            let result = await productsModel.create(product);
-            return result;
+            const newProduct = { _id: this.data.length + 1, ...product };
+            this.data.push(newProduct);
+            return newProduct;
         }catch(error){
             console.log(error);
             return null;
         }
     }
-
+    
 
     updateProduct = async (productId, product) => {
-        try{
-            let result = productsModel.updateOne({_id: productId}, product)
-            return result;
-        }catch(error){
+        try {
+            const index = this.data.findIndex(p => p.id === productId);
+            if (index !== -1) {
+                this.data[index] = { ...this.data[index], ...product };
+                return this.data[index];
+            }
+            return null;
+        } catch (error) {
             console.log(error);
             return null;
         }
     }
 
     deleteProduct = async (productId) => {
-        try{
-            let result = productsModel.deleteOne({_id: productId});
-            return result;
-        }catch(error){
+        try {
+            const index = this.data.findIndex(p => p.id === productId);
+            if (index !== -1) {
+                const deletedProduct = this.data.splice(index, 1);
+                return deletedProduct[0];
+            }
+            return null;
+        } catch (error) {
             console.log(error);
             return null;
         }

@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { isAuthenticated, isNotAuthenticated } from '../middlewares/auth.js';
-import productsModel from '../../dao/models/products.model.js';
+import productsModel from '../dao/mongo/models/products.model.js';
 
 
 router.get('/',(req, res) => {
@@ -50,7 +50,7 @@ router.get('/current', isAuthenticated ,async(req, res) => {
             return res.status(404).send('Página no encontrada');
         }
 
-        res.render('home', { productos: result.docs , first_name: first_name });
+        res.render('home', { productos: result.docs , first_name: first_name});
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al obtener los productos');

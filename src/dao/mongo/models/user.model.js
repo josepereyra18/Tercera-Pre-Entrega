@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     email: {type: String, required: true},
     password: {type: String, required: true},
     age: {type: Number, required: true},
-    isAdmin: {type: String, required: true, default: 'user'},
+    isAdmin: {type: Boolean, required: true, default: false},
     cartId: {type: mongoose.Schema.Types.ObjectId, ref: 'cart'}
  });
 

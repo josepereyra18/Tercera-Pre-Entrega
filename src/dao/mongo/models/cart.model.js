@@ -19,7 +19,7 @@ const cartSchema = new mongoose.Schema({
         ],
         default: []
     },
-    userId: {type: mongoose.Schema.Types.ObjectId, ref: 'cart'}
+    userId: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}
 });
 
 const cartModel = mongoose.model(cartCollection, cartSchema);

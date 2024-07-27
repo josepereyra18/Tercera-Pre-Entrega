@@ -1,7 +1,10 @@
-import productsModel from '../../dao/models/products.model.js'
-import cartModel from '../../dao/models/cart.model.js'
-import productsService from '../service/productsService.js';
-import cartService from '../service/cartsService.js';
+// import { Carts, Products} from "../dao/factory.js";
+import productsDTO from "../dao/DTOs/products.dto.js"
+// r5eeplzsarlo para que se utilice factory 
+// const cartsService = new Carts();
+// const productsService = new Products();
+
+import {cartsService,productsService} from "../repository/index.js";
 
 
 export const getProducts = async (req, res) =>{
@@ -28,7 +31,8 @@ export const createProduct = async (req, res) =>{
     if (!title || !description || !price || !code || !stock || !status || !category){
         res.send({status: error, message: "Faltan datos"});
     }
-    let result = await productsService.createProduct({title, description, price, code, stock, status, category});
+    let prod = new productsDTO(title, description, price, code, stock, status, category);
+    let result = await productsService.createProduct(prod);
     res.send ({result: "success", payload: result});
 }
 
@@ -46,7 +50,7 @@ export const updateProduct = async (req, res) =>{
 export const deleteProduct = async (req, res) =>{
     let { id } = req.params;
     // await cartModel.updateMany({ products: {_id : id}}, { $pull: { products: {_id : id} } });
-    await cartService.updateMany(id);
+    await cartsService.updateMany(id);
     let result = await productsService.deleteProduct(id);
     res.send({result: "success", payload: result});
 }

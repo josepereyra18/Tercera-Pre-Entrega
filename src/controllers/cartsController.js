@@ -1,12 +1,19 @@
-import Carts from "../dao/mongo/clases/cartsService.js";
-import Products from "../dao/mongo/clases/productsService.js";
+// import { Carts, Products, Tickets, Users} from "../dao/factory.js";
+import ticketDto from "../dao/DTOs/ticket.dto.js";
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
+// r5eeplzsarlo para que se utilice factory 
+import {cartsService,productsService,ticketsService, usersService} from "../repository/index.js";
 
-const cartService = new Carts();
-const productsService = new Products();
+// const cartsService = new Carts();
+// const productsService = new Products();
+
 
 export const getCarts =async (req,res) =>{
     try{
-        let carts = await cartService.getCarts()
+        let carts = await cartsService.getCarts()
         res.send({result: "success", payload: carts});
     } catch (error){
         console.log(error);
@@ -17,7 +24,7 @@ export const getCarts =async (req,res) =>{
 export const getCartbyId =async (req, res) =>{
     const cartId = req.params.cid;
     try {
-        const cart = await cartService.getCartbyId(cartId);
+        const cart = await cartsService.getCartbyId(cartId);
         if (!cart) {
             return res.status(404).send({ message: "Carrito no encontrado" });
         }
@@ -30,7 +37,7 @@ export const getCartbyId =async (req, res) =>{
 
 
 export const createCart = async (req, res) =>{
-    await cartService.createCart();
+    await cartsService.createCart();
     res.send({result: "success", message: "Carrito creado"});
 }
 
@@ -39,20 +46,20 @@ export const addProductToCart = async (req,res) =>{
     let { pid } = req.params;
     try{
 
-        let producto = await productsModel.findOne({_id:pid});
-        let carrito = await cartService.getOneCart(id);
+        let producto = await productsService.findOne({_id:pid});
+        let carrito = await cartsService.getOneCart(id);
 
         if (!carrito || !producto){
             return res.status(404).send({ message: "Datos inexistentes" });
         }
 
-        if ( await cartService.findProductInCart(id, pid)){
+        if ( await cartsService.findProductInCart(id, pid)){
             carrito.products.find(prod => prod.product.toString() === producto._id.toString()).quantity++;
         }else{
             carrito.products.push({product:pid , quantity: 1});
         }
 
-        let prodAgregado = await cartService.updateCart(id, carrito);
+        let prodAgregado = await cartsService.updateCart(id, carrito);
         res.send({result: "success", payload: prodAgregado});
     }catch(error){
         console.log(error);
@@ -66,14 +73,14 @@ export const updateCart = async (req, res)=>{
     let { cid } = req.params;
 
     try{
-        let cart = await cartService.findCartById(cid); // find cart by id
+        let cart = await cartsService.findCartById(cid); // find cart by id
         if (!cart){
             return res.status(404).send({message: "El carrito no existe"});
         }
 
         cart.products = arregloProductos;
 
-        let cartUpdated = await cartService.updateCart(cid, cart); //update cart
+        let cartUpdated = await cartsService.updateCart(cid, cart); //update cart
         res.send({result: "success", payload: cartUpdated});
     }catch(error){
         console.log(error);
@@ -87,7 +94,7 @@ export const updateProductFromCart = async (req, res) =>{
     let { quantity } = req.body;
 
     try {
-        let cart = await cartService.findCartById(cid); // fIND CART BY ID
+        let cart = await cartsService.findCartById(cid); // fIND CART BY ID
         if (!cart) {
             return res.status(404).send({ message: "Carrito no encontrado" });
         }
@@ -97,7 +104,7 @@ export const updateProductFromCart = async (req, res) =>{
         }
         producto.quantity = quantity;
 
-        let cartUpdated = await cartService.updateCart(cid, cart); //update cart
+        let cartUpdated = await cartsService.updateCart(cid, cart); //update cart
 
         res.send({ result: "success", payload: cartUpdated });
     } catch (error) {
@@ -112,16 +119,16 @@ export const deleteProductFromCart = async (req, res) =>{
     let { pid } = req.params;
     let prodAgregado;
     try{
-        let carrito = await cartService.getOneCart(id);
-        let producto = await productsModel.findOne({_id: pid});
+        let carrito = await cartsService.getOneCart(id);
+        let producto = await productsService.findOne({_id: pid});
         if (!carrito || !producto){
             return res.status(404).send({ message: "Datos inexistentes" });
         }
         if (carrito.products.find(prod => prod.product.toString() === producto._id.toString()).quantity > 1){
             carrito.products.find(prod => prod.product.toString() === producto._id.toString()).quantity--;
-            prodAgregado = await cartService.updateCart(id, carrito);
+            prodAgregado = await cartsService.updateCart(id, carrito);
         }else{
-            prodAgregado = await cartService.delateproductfromCart(id, pid);
+            prodAgregado = await cartsService.delateproductfromCart(id, pid);
         }
         
         res.send({result: "success", payload: prodAgregado});
@@ -135,12 +142,12 @@ export const deleteProductFromCart = async (req, res) =>{
 export const deleteAllProductsFromCart = async (req, res) =>{
     let { id } = req.params;
     try{
-        let carrito = await cartService.getOneCart(id);
+        let carrito = await cartsService.getOneCart(id);
         if (!carrito){
             return res.status(404).send({ message: "Carrito no encontrado" });
         }
         carrito.products = [];
-        let prodEliminado = await cartService.updateCart(id, carrito);
+        let prodEliminado = await cartsService.updateCart(id, carrito);
 
         res.send({result: "success", payload: prodEliminado});
     }catch(error){
@@ -149,6 +156,72 @@ export const deleteAllProductsFromCart = async (req, res) =>{
     }
 }
 
+
+
+export const checkoutCart = async (req, res) =>{
+    let { cid } = req.params;
+    try{
+        
+        let carrito = await cartsService.getOneCart(cid);
+        if (!carrito){
+            return res.status(404).send({ message: "Carrito no encontrado" });
+        }
+
+        let code = uuidv4();
+        let total = await processProducts(carrito)
+        let user = await usersService.findUserById(carrito.userId);
+        let ticketdto = new ticketDto(code, total, user.email);
+        let ticket = await ticketsService.createTicket(ticketdto);
+        ticket.userId = carrito.userId;
+        await ticketsService.updateTicket(ticket._id, ticket);
+        const transport = nodemailer.createTransport({
+            service: 'gmail',
+            port:587, 
+            auth: {
+              user: process.env.MAIL,
+              pass: process.env.MAIL_PASSWORD
+            }
+        })
+
+        let result = await transport.sendMail({
+            from: process.env.MAIL,
+            to: ticket.purcherser, 
+            subject: `Compra realizada con exito #${code}`,
+            html: `
+            <div>
+                <h1> ${user.first_name}, ¡Recibimos tu compra!</h1>
+                <h2>Nro de Orden #${code}</h2>
+                <h3>Fecha: ${ticket.purchaseDate}</h3>
+                <h4>Productos:</h4>
+                <ul>
+                    ${total.map(prod => `<li>${prod.producto.title} - x${prod.quantity}</li>`).join("")}
+                </ul>
+                <h3>Total: $${ticket.amount}</h3>
+                <h4>Gracias por elegirnos!</h4>
+            </div>
+            `,
+        })
+
+
+        res.send({result: "success", payload: ticket});
+
+
+    }catch(error){
+        console.log(error);
+        res.send({message: "error al generar la compra"});
+    }
+}
+
+
+async function processProducts(carrito) {
+    let productos = [];
+    carrito.products.forEach(async prod => {
+        let producto = await productsService.getProductById(prod.product._id);
+        productos.push({producto, quantity: prod.quantity});
+        // console.log(producto);
+    })
+    return productos;
+}
 
 // no se usa
 // export const deleteCart = async (req, res) =>{
@@ -166,4 +239,3 @@ export const deleteAllProductsFromCart = async (req, res) =>{
 //         res.send({message: "No se pudo eliminar el carrito"});
 //     }
 // }
-

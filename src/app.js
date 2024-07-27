@@ -3,14 +3,16 @@ import __dirname from './utils.js';
 import handlebars from 'express-handlebars';
 import viewsRouter from './routes/views.router.js';
 import { Server } from 'socket.io';
+import dotenv from 'dotenv';
+dotenv.config();
 import productsRouter from './routes/api/products.route.js'
 import cartRouter from './routes//api/carts.route.js'
 import realTimeProducts from './routes/api/realTimeProducts.router.js'
 import chatRouter from './routes/api/message.router.js'
 import mongoose from 'mongoose';
-import productsModel from '../dao/models/products.model.js'
-import chatModel from '../dao/models/chat.model.js';
-import cartModel from '../dao/models/cart.model.js';
+import productsModel from './dao/mongo/models/products.model.js'
+import chatModel from './dao/mongo/models/chat.model.js';
+import cartModel from './dao/mongo/models/cart.model.js';
 import Handlebars from 'handlebars';
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
 import sessionRouter from './routes/api/session.router.js';
@@ -19,18 +21,20 @@ import session from 'express-session';
 import passport from 'passport';
 import initializepassport from './middlewares/passport.config.js';
 import sharedSession from 'express-socket.io-session';
+import productsDto from './dao/DTOs/products.dto.js';
 
 const app = express();
 
-const PORT = 8080;
+const PORT = process.env.PORT_LIVE;
 const httpServer = app.listen(PORT, console.log(`Server is running on port ${PORT}`));
 const socketServer = new Server(httpServer);
 const sessionMiddleware = session(
-    {secret: 'secretkey',
+    {secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
-    store: MongoStore.create({ mongoUrl: 'mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0' })
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL})
 })
+
 
 app.use(sessionMiddleware)
 
@@ -39,7 +43,7 @@ socketServer.use(sharedSession(sessionMiddleware, {
     autoSave: true
 }));
 
-mongoose.connect('mongodb+srv://ecommerce:1234@cluster0.yf8jzfb.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0').then(
+mongoose.connect(process.env.MONGO_URL).then(
     () => {console.log('Conectado a la base de datos')}).catch(error => console.log("error en la conexion ", error))
 
 app.use(express.json());
@@ -74,6 +78,8 @@ socketServer.on('connection', async socket => {
 
 
     console.log('Un cliente se ha conectado');
+
+
     // soket Chat
     socket.on('authenticate', (data) => {
       usuarios.push(socket); 
@@ -116,14 +122,8 @@ socketServer.on('connection', async socket => {
     })
     // Cuando se agrega un producto
     socket.on('agregarProd', async (product) => {
-        await productsModel.create({
-            title: product.title, 
-            description: product.description, 
-            price: product.price, 
-            code: product.code, 
-            stock: product.stock, 
-            status: product.status, 
-            category: product.category});
+        let productdto= new productsDto(product.title, product.description, product.price, product.code, product.stock, product.status, product.category);
+        await productsModel.create(productdto);
         productosActualizados();
     })
   // Cuando se modifica un producto
@@ -137,7 +137,7 @@ socketServer.on('connection', async socket => {
 
     if (session && session.user && session.user.cartId) {
         const cartId = session.user.cartId;
-        console.log('Cart ID from session:', cartId);
+        console.log('Cart ID de session:', cartId);
         socket.emit('cartId', cartId);
     }
 

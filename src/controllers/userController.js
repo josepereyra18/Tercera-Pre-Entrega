@@ -12,9 +12,9 @@ class AuthController {
                 console.log("El usuario ya existe");
                 return done(null, false);
             }
-
+            let userDto = new usersDTO(first_name, last_name, email, password, age);
             let passwordHash = createHash(password);
-            let userDto = new usersDTO(first_name, last_name, email, passwordHash, age);
+            userDto.password = passwordHash;
 
             if (!userDto.isAdmin) {
                 let cart = await cartsService.createCart({});

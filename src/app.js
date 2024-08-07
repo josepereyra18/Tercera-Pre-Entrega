@@ -122,7 +122,7 @@ socketServer.on('connection', async socket => {
     })
     // Cuando se agrega un producto
     socket.on('agregarProd', async (product) => {
-        let productdto= new productsDto(product.title, product.description, product.price, product.code, product.stock, product.status, product.category);
+        let productdto= new productsDto(product.title, product.description, product.price, product.code, product.stock, product.category);
         await productsModel.create(productdto);
         productosActualizados();
     })
